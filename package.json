@@ -1,0 +1,32 @@
+{
+  "name": "geojson-tile-cache",
+  "version": "0.1.0",
+  "description": "cache tiled geojson files",
+  "main": "index.js",
+  "dependencies": {
+    "geojson-slicer": "0.0.0",
+    "npmlog": "^4.0.2",
+    "osmtile2bound": "^0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anetz89/geojson-tile-cache.git"
+  },
+  "keywords": [
+    "tile",
+    "geojson",
+    "osm",
+    "bound",
+    "map"
+  ],
+  "author": "anetz89",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anetz89/geojson-tile-cache/issues"
+  },
+  "homepage": "https://github.com/anetz89/geojson-tile-cache#readme"
+}
