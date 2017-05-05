@@ -1,11 +1,29 @@
 (function() {
     'use strict';
 
-    let log = require('npmlog'),
+    const
+        log = require('npmlog'),
         slice = require('geojson-slicer'),
         osmtile2bound = require('osmtile2bound');
 
-    module.exports = function(opts) {
+    module.exports = {
+        get : function(id, opts) {
+            if (id === 'get') {
+                return null;
+            }
+            log.verbose('require tile cache for ' + id);
+            if (!this.hasOwnProperty(id)) {
+                log.verbose('create new ' + id);
+                this[id] = new Cache(opts);
+            }
+
+            log.verbose(this[id]);
+
+            return this[id];
+        }
+    };
+
+    function Cache(opts) {
         let options = opts || {},
             cache = {},
             refZoom = options.refZoom || 13;
@@ -16,12 +34,12 @@
                 return false;
             }
 
-            if (tile.z < refZoom) {
+            if (tile.z > refZoom) {
                 log.error('tile to add does not fit to internal minZoom (tile, minZoom).', tile.z, refZoom);
 
                 return false;
             }
-            if (tile.z > refZoom) {
+            if (tile.z < refZoom) {
                 // split up tile to all tiles in the necessary zoomlevel
                 let tiles = splitTile(tile);
 
@@ -35,13 +53,35 @@
             return true;
         }
 
+        function fitsTileLimit(tile) {
+            if (!options.limits) {
+                return true;
+            }
+            if (options.limits.xMin && tile.x < options.limits.xMin) {
+                return false;
+            }
+            if (options.limits.xMax && tile.x > options.limits.xMax) {
+                return false;
+            }
+            if (options.limits.yMin && tile.y < options.limits.yMin) {
+                return false;
+            }
+            if (options.limits.yMax && tile.x > options.limits.yMax) {
+                return false;
+            }
+
+            return true;
+        }
+
         // fill available data in a set of tlies
         function fillTiles(tiles, data) {
             if (!data) {
                 return false;
             }
             tiles.forEach(function(tile) {
-                add(tile, slice(data, osmtile2bound(tile)));
+                if (tile.z === refZoom && fitsTileLimit(tile)) {
+                    add(tile, slice(data, osmtile2bound(tile)));
+                }
             });
 
             return true;
@@ -138,7 +178,7 @@
                 result = [];
 
             necessary.forEach(function(necTile) {
-                result.concat(cache[necTile.x][necTile.y].features);
+                result = result.concat(cache[necTile.x][necTile.y].features);
             });
 
             return {
@@ -158,5 +198,5 @@
             // cover the given tile
             getReferenceTiles : getReferenceTiles
         };
-    };
+    }
 }());

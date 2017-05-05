@@ -4,7 +4,7 @@
   "description": "cache tiled geojson files",
   "main": "index.js",
   "dependencies": {
-    "geojson-slicer": "0.0.0",
+    "geojson-slicer": "0.1.0",
     "npmlog": "^4.0.2",
     "osmtile2bound": "^0.2.0"
   },
