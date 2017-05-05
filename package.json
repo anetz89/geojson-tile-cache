@@ -1,6 +1,6 @@
 {
   "name": "geojson-tile-cache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "cache tiled geojson files",
   "main": "index.js",
   "dependencies": {

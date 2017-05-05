@@ -66,7 +66,7 @@
             if (options.limits.yMin && tile.y < options.limits.yMin) {
                 return false;
             }
-            if (options.limits.yMax && tile.x > options.limits.yMax) {
+            if (options.limits.yMax && tile.y > options.limits.yMax) {
                 return false;
             }
 
