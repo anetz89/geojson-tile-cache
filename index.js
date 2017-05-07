@@ -188,12 +188,14 @@
         }
 
         return {
-            // add(tile, geojson)
+            // add(tile, geoJSON) -> boolean
             add : add,
-            // get(tile) -> geojson
+            // get(tile) -> geoJSON
             get : get,
-            // getCoverTiles(tile) -> tile[] available to cover given tile
+            // TODO remove
             getCoverTiles : getCoverTiles,
+            // getCoverTiles(tile) -> tile[] available to cover given tile
+            has : getCoverTiles,
             // getReferenceTiles(tile) -> tile[] necessary tiles in the reference zoom to
             // cover the given tile
             getReferenceTiles : getReferenceTiles
