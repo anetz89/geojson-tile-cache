@@ -70,6 +70,20 @@ The returned tile list describes a list of all reference tiles that are needed f
 
 ### Options
 
+#### cacheAdd *function* (default: null)
+Pass a custom cacheAdd function that is used whenever a reference tile should be stored in the cache.
+This method will be called whenever Cache.add() is called. This method can be used to override the
+internal cache and provide a custom cache, like a database.
+
+**Note**: *if cacheAdd is added, cacheGet also needs to be implemented*.
+
+#### cacheGet *function* (default: null)
+Pass a custom cacheGet function that is used whenever a reference tile should be loaded from the cache.
+This method will be called whenever a reference tile is needed. This method can be used to override the
+internal cache and provide a custom cache, like a database.
+
+**Note**: *if cacheGet is added, cacheAdd also needs to be implemented*.
+
 #### limits *object* (default: null)
 The passed limit object describes a region the cache should work with.
 

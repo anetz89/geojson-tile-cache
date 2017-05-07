@@ -6,51 +6,69 @@
         slice = require('geojson-slicer'),
         osmtile2bound = require('osmtile2bound');
 
-    module.exports = {
-        get : function(id, opts) {
-            if (id === 'get') {
-                return null;
-            }
-            log.verbose('require tile cache for ' + id);
-            if (!this.hasOwnProperty(id)) {
-                log.verbose('create new ' + id);
-                this[id] = new Cache(opts);
-            }
-
-            log.verbose(this[id]);
-
-            return this[id];
+    module.exports = function(id, opts) {
+        if (!this.hasOwnProperty(id)) {
+            // return new cache instance if id not yet available
+            this[id] = new Cache(opts);
         }
+        // return existing cache instance
+        return this[id];
     };
 
     function Cache(opts) {
         let options = opts || {},
-            cache = {},
-            refZoom = options.refZoom || 13;
+            refZoom = options.refZoom || 13,
+            cache,  // internal cache if no cacheAdd/cacheGet provided
+            cacheAdd = options.cacheAdd,
+            cacheGet = options.cacheGet;
 
-        // add data into a single tile
+
+        // fallback to normal cache object if options do not provide proper handlers
+        if (!cacheAdd || !cacheGet ||
+                typeof cacheAdd !== 'function' || typeof cacheGet !== 'function') {
+
+            cache = {};
+
+            cacheAdd = function(tile, data) {
+                // TODO more checks here? is data geoJSON? is data FeatureCollection?
+                if (!data) {
+                    return false;
+                }
+                if (!cache[tile.x]) {
+                    cache[tile.x] = {};
+                }
+                cache[tile.x][tile.y] = data;
+
+                return true;
+            };
+
+            cacheGet = function(tile) {
+                if (cache.hasOwnProperty(tile.x)) {
+                    return cache[tile.x][tile.y];
+                }
+                return null;
+            };
+        }
+
+        // add data
         function add(tile, data) {
-            if (!data) {
-                return false;
-            }
-
             if (tile.z > refZoom) {
-                log.error('tile to add does not fit to internal minZoom (tile, minZoom).', tile.z, refZoom);
+                // zoom of tile does not fullfil refZoom requirement. lack of data possible -> reject
+                log.error('tile to add does not fit to internal minZoom (tile, minZoom).',
+                        tile.z, refZoom);
 
                 return false;
             }
+
             if (tile.z < refZoom) {
-                // split up tile to all tiles in the necessary zoomlevel
+                // tile is bigger than refZoom -> split up data to refZoom tiles
                 let tiles = splitTile(tile);
 
                 return fillTiles(tiles, data);
             }
-            if (!cache[tile.x]) {
-                cache[tile.x] = {};
-            }
-            cache[tile.x][tile.y] = data;
 
-            return true;
+            // tile is in refZoom, fill cache with data
+            return cacheAdd(tile, data);
         }
 
         function fitsTileLimit(tile) {
@@ -92,7 +110,7 @@
                 allAvailable = true;
 
             tiles.forEach(function(tile) {
-                if (cache[tile.x] && cache[tile.x][tile.y]) {
+                if (cacheGet(tile)) {
                     return;
                 }
                 allAvailable = false;
@@ -178,7 +196,7 @@
                 result = [];
 
             necessary.forEach(function(necTile) {
-                result = result.concat(cache[necTile.x][necTile.y].features);
+                result = result.concat(cacheGet(necTile).features);
             });
 
             return {
