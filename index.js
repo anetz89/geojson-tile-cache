@@ -4,15 +4,16 @@
     const
         log = require('npmlog'),
         slice = require('geojson-slicer'),
-        osmtile2bound = require('osmtile2bound');
+        osmtile2bound = require('osmtile2bound'),
+        caches = {};
 
     module.exports = function(id, opts) {
-        if (!this.hasOwnProperty(id)) {
+        if (!caches.hasOwnProperty(id)) {
             // return new cache instance if id not yet available
-            this[id] = new Cache(opts);
+            caches[id] = new Cache(opts);
         }
         // return existing cache instance
-        return this[id];
+        return caches[id];
     };
 
     function Cache(opts) {

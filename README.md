@@ -118,14 +118,13 @@ The higher the refZoom is, the faster data can be added to the cache. This shoul
 - Low refZoom (= high OSM zoom value, like 15)
 The lower the refZoom is, the faster data can be provided by the cache. This should be considered if there is a lot of data for a small region. Example: buildings and streets
 
-### Add limits
+#### Add limits
 Adding limits allows you to speed up the Cache.add() calls, especially for low refZooms. The default refZoom (13) contains 67,108,864 tiles. Splitting data into these tiles may take a long time. If you know in which region your data is located, you can limit the amount of tiles (e.g. to 1000) and therefore improve the performance.
 
 ## Future Work
 - better inline documentation
 - zoom independent limits option (WGS84 coordinates instead of OSM tile values)
 - better performance
-- more generic way of caching data (allow to overwrite writing/loading data to/from a custom cache, like a database)
 - getReferenceTiles: returned tiles contain a flag whether the tile is already loaded or not.
 
 ## Contribute
